@@ -15,16 +15,25 @@ const Movie = ({ movieId }) => {
   const [movie, loading, error] = useMovieFetch(movieId);
   console.log(movie);
 
+  if (error) return <div>Something went wrong...</div>;
+
+  if (loading) return <Spinner />;
+
   return (
     <Fragment>
-      <Navigation />
-      <MovieInfo />
-      <MovieInfoBar />
+      <Navigation movie={movie.original_title} />
+      <MovieInfo movie={movie} />
+      <MovieInfoBar
+        time={movie.runtime}
+        budget={movie.budget}
+        revenue={movie.revenue}
+      />
 
-      <Grid>
-        <Actor />
+      <Grid header='Actors'>
+        {movie.actors.map(actor => (
+          <Actor key={actor.credit_id} actor={actor} />
+        ))}
       </Grid>
-      <Spinner />
     </Fragment>
   );
 };

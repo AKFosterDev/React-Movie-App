@@ -1,13 +1,13 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  SEARCH_BASE_URL,
   POPULAR_BASE_URL,
-  IMAGE_BASE_URL,
-  BACKDROP_SIZE,
+  SEARCH_BASE_URL,
   POSTER_SIZE,
+  BACKDROP_SIZE,
+  IMAGE_BASE_URL,
 } from '../config';
 
-// Import Components
+// import Components
 import HeroImage from './elements/HeroImage';
 import SearchBar from './elements/SearchBar';
 import Grid from './elements/Grid';
@@ -21,6 +21,7 @@ import { useHomeFetch } from './hooks/useHomeFetch';
 import NoImage from './images/no_image.jpg';
 
 const Home = () => {
+  const [searchTerm, setSearchTerm] = useState('');
   const [
     {
       state: { movies, currentPage, totalPages, heroImage },
@@ -28,11 +29,10 @@ const Home = () => {
       error,
     },
     fetchMovies,
-  ] = useHomeFetch();
-  const [searchTerm, setSearchTerm] = useState('');
+  ] = useHomeFetch(searchTerm);
 
   const searchMovies = search => {
-    const endpoint = search ? `${SEARCH_BASE_URL}${search}` : POPULAR_BASE_URL;
+    const endpoint = search ? SEARCH_BASE_URL + search : POPULAR_BASE_URL;
 
     setSearchTerm(search);
     fetchMovies(endpoint);
@@ -49,16 +49,11 @@ const Home = () => {
     fetchMovies(endpoint);
   };
 
-  if (error) {
-    return <div>Something went wrong</div>;
-  }
-
-  if (!movies[0]) {
-    return <Spinner />;
-  }
+  if (error) return <div>Something went wrong ...</div>;
+  if (!movies[0]) return <Spinner />;
 
   return (
-    <Fragment>
+    <>
       {!searchTerm && (
         <HeroImage
           image={`${IMAGE_BASE_URL}${BACKDROP_SIZE}${heroImage.backdrop_path}`}
@@ -74,7 +69,7 @@ const Home = () => {
             clickable
             image={
               movie.poster_path
-                ? `${IMAGE_BASE_URL}${POSTER_SIZE}${movie.poster_path}`
+                ? IMAGE_BASE_URL + POSTER_SIZE + movie.poster_path
                 : NoImage
             }
             movieId={movie.id}
@@ -86,7 +81,7 @@ const Home = () => {
       {currentPage < totalPages && !loading && (
         <LoadMoreBtn text='Load More' callback={loadMoreMovies} />
       )}
-    </Fragment>
+    </>
   );
 };
 
